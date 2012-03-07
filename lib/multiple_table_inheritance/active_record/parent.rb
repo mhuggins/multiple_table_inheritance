@@ -6,7 +6,7 @@ module MultipleTableInheritance
       end
       
       def self.included(base)
-        base.extend(ClassMethods)
+        base.extend ClassMethods
         base.class_attribute :subtype_column
       end
       
@@ -14,21 +14,16 @@ module MultipleTableInheritance
         def acts_as_superclass(options={})
           options = Parent::default_options.merge(options.to_options.reject { |k,v| v.nil? })
           self.subtype_column = options[:subtype]
-          
-          if self.column_names.include?(subtype_column.to_s)
-            class << self
-              alias_method_chain :find_by_sql, :inherits
-            end
-          end
+          extend FinderMethods if column_names.include?(subtype_column.to_s)
         end
-        
-        private
-        
-        def find_by_sql_with_inherits(*args)
-          parent_records = find_by_sql_without_inherits(*args)
+      end
+      
+      module FinderMethods
+        def find_by_sql(*args)
+          parent_records = super(*args)
           child_records = []
           
-          # find all child records
+          # Find all child records.
           ids_by_type(parent_records).each do |type, ids|
             begin
               klass = type.constantize
@@ -38,20 +33,25 @@ module MultipleTableInheritance
             end
           end
           
-          # associate the parent records with the child records to reduce SQL calls and prevent recursion
+          # Associate the parent records with the child records to reduce SQL calls and prevent recursion.
           child_records.each do |child|
             association_name = to_s.demodulize.underscore
             parent = parent_records.find { |parent| child.id == parent.id }
             child.send("#{association_name}=", parent)
           end
           
-          # TODO order the child_records array to match the order of the parent_records array (by comparing id's)
-          
-          child_records
+          # Order the child_records array to match the order of the parent_records array.
+          child_records.sort! do |a, b|
+            a_index = parent_records.index { |parent| parent.id == a.id }
+            b_index = parent_records.index { |parent| parent.id == b.id }
+            a_index <=> b_index
+          end
         end
         
+        private
+        
         def ids_by_type(records)
-          subtypes = records.collect(&self.subtype_column.to_sym).uniq
+          subtypes = records.collect(&subtype_column.to_sym).uniq
           subtypes = subtypes.collect do |subtype|
             subtype_records = records.select { |record| record[subtype_column.to_sym] == subtype}
             subtype_ids = subtype_records.collect { |record| record.id }
