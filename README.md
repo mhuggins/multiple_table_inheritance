@@ -193,19 +193,19 @@ Associations will also work in the same way as other attributes.
       belongs_to :team
     end
     
-    class ::Programmer < ActiveRecord::Base
+    class Programmer < ActiveRecord::Base
       inherits_from :employee
       has_many :known_languages
       has_many :languages, :through => :known_languages
     end
     
-    class ::Language < ActiveRecord::Base
+    class Language < ActiveRecord::Base
       attr_accessible :name
       has_many :known_languages
       has_many :programmers, :through => :known_languages
     end
     
-    class ::KnownLanguage < ActiveRecord::Base
+    class KnownLanguage < ActiveRecord::Base
       belongs_to :programmer
       belongs_to :language
     end
