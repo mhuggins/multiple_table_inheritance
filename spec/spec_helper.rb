@@ -19,20 +19,20 @@ require 'support/models'
 
 module MultipleTableInheritanceSpecHelper
   def mock_everything
-    @team = Team.create!(:name => 'Website')
-    @java = Language.create!(:name => 'Java')
-    @cpp = Language.create!(:name => 'C++')
-    @programmer = Programmer.create!(
+    team = Team.create!(:name => 'Website')
+    java = Language.create!(:name => 'Java')
+    cpp = Language.create!(:name => 'C++')
+    Programmer.create!(
         :first_name => 'Mario',
         :last_name => 'Mario',
         :salary => 65000,
-        :team => @team,
-        :languages => [@java, @cpp])  # programmer-specific relationship
-    @manager = Manager.create!(
+        :team => team,
+        :languages => [java, cpp])  # programmer-specific relationship
+    Manager.create!(
         :first_name => 'King',
         :last_name => 'Koopa',
         :salary => 70000,
-        :team => @team,
+        :team => team,
         :bonus => 5000)  # manager-specific field
   end
 end

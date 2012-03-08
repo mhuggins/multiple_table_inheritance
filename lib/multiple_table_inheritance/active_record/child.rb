@@ -16,7 +16,8 @@ module MultipleTableInheritance
           options = Child::default_options.merge(options.to_options.reject { |k,v| v.nil? })
           inherit_methods = options.delete(:inherit_methods)
           
-          extend InheritClassMethods
+          extend SharedMethods
+          include SharedMethods
           include InstanceMethods
           include DelegateMethods if inherit_methods
           
@@ -73,7 +74,7 @@ module MultipleTableInheritance
         end
       end
       
-      module InheritClassMethods
+      module SharedMethods
         def find_by_id(*args)
           send("find_by_#{parent_association_name}_id", *args)
         end
