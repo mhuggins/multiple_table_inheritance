@@ -65,6 +65,13 @@ extended.
       acts_as_superclass
     end
 
+As mentioned in the migration section, the name of the subtype column can be
+defined here if it's something other than the default of "subtype".
+
+    class Employee < ActiveRecord::Base
+      acts_as_superclass, :subtype => 'employee_type'
+    end
+
 Conversely, the `inherits_from` method is used to represent that a given model
 extends another model.  It takes one optional parameter, which is the symbol
 desired for referencing the relationship.

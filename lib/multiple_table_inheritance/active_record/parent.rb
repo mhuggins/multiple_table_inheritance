@@ -14,7 +14,12 @@ module MultipleTableInheritance
         def acts_as_superclass(options={})
           options = Parent::default_options.merge(options.to_options.reject { |k,v| v.nil? })
           self.subtype_column = options[:subtype]
-          extend FinderMethods if column_names.include?(subtype_column.to_s)
+          
+          if column_names.include?(subtype_column.to_s)
+            extend FinderMethods
+            include InstanceMethods
+            before_destroy :destroy_child_association
+          end
         end
       end
       
@@ -58,6 +63,21 @@ module MultipleTableInheritance
             [subtype, subtype_ids]
           end
           Hash[subtypes]
+        end
+      end
+      
+      module InstanceMethods
+        def destroy_child_association
+          child_class = send(subtype_column.to_sym).constantize
+          if child = child_class.find_by_id(id)
+            child.delete
+          end
+        rescue NameError => e
+          # TODO log error
+        end
+        
+        def find_by_subtype(*args)
+          super || send("find_by_#{subtype_column}", *args)
         end
       end
     end

@@ -1,7 +1,3 @@
-require 'multiple_table_inheritance/railtie'
-
-MultipleTableInheritance::Railtie.insert
-
 ActiveRecord::Base.establish_connection(
   :adapter => 'sqlite3',
   :database => File.expand_path(File.join(File.dirname(__FILE__), '../../db/multiple_table_inheritance.db'))

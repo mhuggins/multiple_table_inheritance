@@ -1,8 +1,21 @@
 require 'active_record'
 require 'database_cleaner'
-require File.expand_path(File.join(File.dirname(__FILE__), '../lib/multiple_table_inheritance'))
+require 'multiple_table_inheritance'
+
+MultipleTableInheritance::ActiveRecord::Parent::ClassMethods.module_eval do
+  def find_without_inheritance(&block)
+    # remove_method :find_by_sql
+    extend ActiveRecord::Querying
+    result = yield
+    extend MultipleTableInheritance::ActiveRecord::Parent::FinderMethods
+    result
+  end
+end
+
+MultipleTableInheritance::Railtie.insert
+
 require 'support/tables'
-require 'support/classes'
+require 'support/models'
 
 module MultipleTableInheritanceSpecHelper
   def mock_everything
