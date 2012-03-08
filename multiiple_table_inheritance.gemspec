@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.md"]
   
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.rubygems_version = %q{0.1.0}
+  s.rubygems_version = %q{1.3.6}
   
   s.add_dependency('activerecord', '>= 3.0.0')
   s.add_dependency('activesupport', '>= 3.0.0')
