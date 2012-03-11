@@ -23,7 +23,7 @@ From the command line:
 
 From your Gemfile:
 
-    gem 'multiple_table_inheritance', '~> 0.1.0'
+    gem 'multiple_table_inheritance', '~> 0.1.2'
 
 Usage
 =====

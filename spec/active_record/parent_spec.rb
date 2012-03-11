@@ -1,26 +1,68 @@
 require 'spec_helper'
 
-describe MultipleTableInheritance::ActiveRecord::Parent do
+describe MultipleTableInheritance::Parent do
+  describe 'methods' do
+    it 'should allow records to be found without inheritance' do
+      employees = Employee.as_supertype.all
+      employees.each do |employee|
+        employee.should be_instance_of(Employee)
+      end
+    end
+  end
+  
   context 'retrieving records' do
-    it 'should only fetch child records' do
-      Employee.find_each do |employee|
-        employee.should_not be_instance_of(Employee)
-        ['Programmer', 'Manager'].should include(employee.class.to_s)
+    before do
+      mock_everything!
+    end
+    
+    it 'should retrieve child records' do
+      Employee.find_each do |programmer_or_manager|
+        programmer_or_manager.should_not be_instance_of(Employee)
+        ['Programmer', 'Manager'].should include(programmer_or_manager.class.to_s)
       end
     end
     
-    it 'should fetch all child records' do
-      pending "find_without_inheritance is not working as intended"
+    it 'should allow access to parent record' do
+      programmer_or_manager = Employee.first
+      programmer_or_manager.employee.should be_instance_of(Employee)
+    end
+    
+    it 'should include all records' do
       modified_results = Employee.all
-      original_results = Employee.find_without_inheritance { Employee.all }
+      original_results = Employee.as_supertype.all
       modified_results.size.should == original_results.size
     end
     
     it 'should maintain result order' do
-      pending "find_without_inheritance is not working as intended"
       modified_results = Employee.order("id desc").all
-      original_results = Employee.find_without_inheritance { Employee.order("id desc").all }
+      original_results = Employee.as_supertype.order("id desc").all
       modified_results.collect(&:id).should == original_results.collect(&:id)
+    end
+    
+    context 'associations preloading' do
+      context 'is enabled' do
+        before do
+          @programmer_or_manager = Employee.includes(:team).first
+        end
+        
+        it 'should not perform an extra find' do
+          pending "ensure that team is not retrieved from the database"
+          Team.any_instance.should_not_receive(:find_by_sql)
+          @programmer_or_manager.employee.team
+        end
+      end
+      
+      context 'is disabled' do
+        before do
+          @programmer_or_manager = Employee.first
+        end
+        
+        it 'should not perform an extra find' do
+          pending "ensure that team is retrieved from the database"
+          Team.any_instance.should_receive(:find_by_sql).at_least(:once)
+          @programmer_or_manager.employee.team
+        end
+      end
     end
     
     context 'an invalid subtype exists' do
@@ -39,11 +81,11 @@ describe MultipleTableInheritance::ActiveRecord::Parent do
       end
     end
     
-    context 'default subtype used' do
+    context 'default subtype is used' do
       pending "test_everything"
     end
     
-    context 'custom subtype used' do
+    context 'custom subtype is used' do
       pending "test_everything"
     end
     
@@ -65,7 +107,7 @@ describe MultipleTableInheritance::ActiveRecord::Parent do
     end
     
     it 'should delete the child record' do
-      @employee.destroy.should be_true
+      @employee.destroy
       Programmer.find_by_id(@employee_id).should be_nil
     end
   end

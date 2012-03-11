@@ -1,6 +1,6 @@
 module MultipleTableInheritance
-  module ActiveRecord
-    module Child
+  module Child
+    module Base
       def self.default_options
         { :dependent => :destroy, :inherit_methods => false }
       end
@@ -13,12 +13,11 @@ module MultipleTableInheritance
       module ClassMethods
         def inherits_from(association_name, options={})
           # Standardize options, and remove those that should not affect the belongs_to relationship
-          options = Child::default_options.merge(options.to_options.reject { |k,v| v.nil? })
+          options = Base::default_options.merge(options.to_options)
           inherit_methods = options.delete(:inherit_methods)
           
-          extend SharedMethods
-          include SharedMethods
-          include InstanceMethods
+          extend FinderMethods, SharedMethods
+          include InstanceMethods, SharedMethods
           include DelegateMethods if inherit_methods
           
           # Set association references.
@@ -74,6 +73,16 @@ module MultipleTableInheritance
         end
       end
       
+      module FinderMethods
+        def find_by_sql(*args)
+          child_records = super(*args)
+        
+          child_records.each do |child|
+            child.send(:parent_association=, parent_association_class.as_supertype.find_by_id(child.id))
+          end
+        end
+      end
+      
       module SharedMethods
         def find_by_id(*args)
           send("find_by_#{parent_association_name}_id", *args)
@@ -85,6 +94,10 @@ module MultipleTableInheritance
         
         def parent_association
           send(self.class.parent_association_name)
+        end
+        
+        def parent_association=(record)
+          send("#{self.class.parent_association_name}=", record)
         end
         
         def set_association_subtype

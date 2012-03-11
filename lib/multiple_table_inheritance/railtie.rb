@@ -10,12 +10,16 @@ module MultipleTableInheritance
   class Railtie
     def self.insert
       ::ActiveRecord::Base.module_eval do
-        include MultipleTableInheritance::ActiveRecord::Child
-        include MultipleTableInheritance::ActiveRecord::Parent
+        include MultipleTableInheritance::Child::Base
+        include MultipleTableInheritance::Parent::Base
+      end
+      
+      ::ActiveRecord::Relation.module_eval do
+        include MultipleTableInheritance::Parent::Relation
       end
       
       ::ActiveRecord::ConnectionAdapters::SchemaStatements.module_eval do
-        include MultipleTableInheritance::ActiveRecord::Migration
+        include MultipleTableInheritance::Migration
       end
     end
   end
