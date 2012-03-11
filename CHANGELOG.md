@@ -1,3 +1,7 @@
+0.1.3
+
+* Fixed a bug that prevented migrations from being run properly.
+
 0.1.2
 
 * Fixed a bug that resulted in parent record not being accessible after
