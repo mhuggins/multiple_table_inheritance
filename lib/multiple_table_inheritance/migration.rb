@@ -1,14 +1,12 @@
 module MultipleTableInheritance
   module Migration
     def self.included(base)
-      base.extend ClassMethods
+      base.alias_method_chain :create_table, :inherits
     end
     
-    module ClassMethods
-      def create_table(table_name, options = {}, &block)
-        options[:primary_key] = "#{options[:inherits]}_id" if options[:inherits]
-        super(table_name, options, &block)
-      end
+    def create_table_with_inherits(table_name, options = {}, &block)
+      options[:primary_key] = "#{options[:inherits]}_id" if options[:inherits]
+      create_table_without_inherits(table_name, options, &block)
     end
   end
 end
