@@ -16,7 +16,7 @@ module MultipleTableInheritance
         def acts_as_superclass(options={})
           options = Base::default_options.merge(options.to_options)
           self.subtype_column = options[:subtype]
-
+          
           if column_names.include?(subtype_column.to_s)
             include InstanceMethods
             before_destroy :destroy_child_association
@@ -33,7 +33,7 @@ module MultipleTableInheritance
         rescue NameError => e
           # TODO log error
         end
-
+        
         def find_by_subtype(*args)
           super || send("find_by_#{subtype_column}", *args)
         end

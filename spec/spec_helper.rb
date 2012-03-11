@@ -8,7 +8,7 @@ require 'support/tables'
 require 'support/models'
 
 module MultipleTableInheritanceSpecHelper
-  def mock_everything!
+  def mock_employees!
     3.times do |i|
       team = Team.create!(:name => "Team#{i}")
       language = Language.create!(:name => "Java 1.#{i + 4}")
@@ -28,6 +28,24 @@ module MultipleTableInheritanceSpecHelper
           :salary => 70000 + (i * 2500),
           :team => Team.first,
           :bonus => i * 2500)  # manager-specific field
+    end
+  end
+  
+  def mock_pets!
+    3.times do |i|
+      owner = Pet::Owner.create!(:first_name => 'Bob', :last_name => "Smith #{i}") do |owner|
+        owner.ssn = (123456789 + i).to_s
+      end
+      
+      dog = Pet::Dog.create!(:name => "Rover #{i}") do |dog|
+        dog.owner = owner
+        dog.favorite_toy = "#{i + 1}-inch Bone"
+      end
+      
+      cat = Pet::Cat.create!(:name => "Mittens #{i}") do |cat|
+        cat.owner = owner
+        cat.longest_nap = 100 + i
+      end
     end
   end
 end

@@ -51,7 +51,7 @@ module MultipleTableInheritance
         
         def parent_association_class
           reflection = create_reflection(:belongs_to, parent_association_name, {}, self)
-          reflection.class_name.constantize
+          reflection.klass
         end
         
         def inherited_columns_and_associations
@@ -76,9 +76,10 @@ module MultipleTableInheritance
       module FinderMethods
         def find_by_sql(*args)
           child_records = super(*args)
-        
+          
           child_records.each do |child|
-            child.send(:parent_association=, parent_association_class.as_supertype.find_by_id(child.id))
+            parent = parent_association_class.as_supertype.find_by_id(child.id)
+            child.send(:parent_association=, parent)
           end
         end
       end

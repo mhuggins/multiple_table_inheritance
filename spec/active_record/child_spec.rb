@@ -57,7 +57,7 @@ describe MultipleTableInheritance::Child do
   
   context 'deleting records' do
     before do
-      mock_everything!
+      mock_employees!
       @programmer = Programmer.first
       @programmer_id = @programmer.id
     end
@@ -81,7 +81,7 @@ describe MultipleTableInheritance::Child do
   
   context 'methods' do
     before do
-      mock_everything!
+      mock_employees!
     end
     
     context 'accessing parent records' do

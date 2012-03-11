@@ -1,3 +1,7 @@
+###############################################
+# Non-namespaced models
+###############################################
+
 class Employee < ActiveRecord::Base
   acts_as_superclass
   attr_accessible :first_name, :last_name, :salary, :team, :team_id
@@ -38,4 +42,38 @@ class KnownLanguage < ActiveRecord::Base
   belongs_to :language
   validates :programmer_id, :presence => true
   validates :language_id, :presence => true, :uniqueness => { :scope => :programmer_id }
+end
+
+###############################################
+# Namespaced models
+###############################################
+
+module Pet
+  def self.table_name_prefix
+    'pet_'
+  end
+  
+  class Owner < ActiveRecord::Base
+    attr_accessible :first_name, :last_name
+    has_many :pets
+    validates :first_name, :presence => true
+    validates :last_name, :presence => true
+    validates :ssn, :presence => true
+  end
+
+  class Pet < ActiveRecord::Base
+    acts_as_superclass :subtype => 'species'
+    attr_accessible :name
+    belongs_to :owner
+    validates :owner_id, :presence => true
+    validates :name, :presence => true
+  end
+  
+  class Cat < ActiveRecord::Base
+    inherits_from :pet, :class_name => 'Pet::Pet'
+  end
+  
+  class Dog < ActiveRecord::Base
+    inherits_from :pet, :class_name => 'Pet::Pet'
+  end
 end
