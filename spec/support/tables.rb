@@ -103,7 +103,7 @@ conn.create_table :store_beds, :inherits => :furniture do |t|
   t.string :size, :null => false
 end
 
-conn.create_table :store_chairs, :inherits => :furniture do |t|
+conn.create_table :store_tables, :inherits => :furniture do |t|
   t.integer :chairs, :null => false
   t.string :color, :null => false
 end

@@ -201,30 +201,31 @@ describe MultipleTableInheritance::Child do
         context 'on just child' do
           context 'without assigning all attributes' do
             before(:each) do
-              @bed = Store::Bed.create(:brand => 'Sealy', :name => 'Feathertop')
+              @table = Store::Table.create(:brand => 'Rio', :name => 'Corner Office')
             end
             
             it 'should have errors' do
-              @bed.errors.messages.should_not be_empty
-              @bed.errors.messages.keys.should include(:size)
+              @table.errors.messages.should_not be_empty
+              @table.errors.messages.keys.should include(:color)
+              @table.errors.messages.keys.should include(:chairs)
             end
             
             it 'should not have been saved' do
-              @bed.should be_new_record
+              @table.should be_new_record
             end
           end
           
           context 'with all attributes assigned' do
             before(:each) do
-              @bed = Store::Bed.create(:brand => 'Sealy', :name => 'Feathertop', :size => 'Queen')
+              @table = Store::Table.create(:brand => 'Rio', :name => 'Corner Office', :color => 'Brown', :chairs => 1)
             end
             
             it 'should not have errors' do
-              @bed.errors.messages.should be_empty
+              @table.errors.messages.should be_empty
             end
             
             it 'should have been saved' do
-              @bed.should_not be_new_record
+              @table.should_not be_new_record
             end
           end
         end
@@ -321,31 +322,32 @@ describe MultipleTableInheritance::Child do
       end
       
       context 'without mass assignment security' do
-        context 'with attributes set on instance' do
+        context 'without assigning all attributes' do
           before(:each) do
-            # TODO
+            @bed = Store::Bed.create(:brand => 'Sealy', :size => 'Queen')
           end
           
-          it 'should not have errors' do
-            pending "create a model that allows for proper testing"
+          it 'should have errors' do
+            @bed.errors.messages.should_not be_empty
+            @bed.errors.messages.keys.should include(:name)
           end
           
-          it 'should have been saved' do
-            pending "create a model that allows for proper testing"
+          it 'should not have been saved' do
+            @bed.should be_new_record
           end
         end
         
-        context 'with attributes specified in hash' do
+        context 'with all attributes assigned' do
           before(:each) do
-            # TODO
+            @bed = Store::Bed.create(:brand => 'Sealy', :name => 'Feathertop', :size => 'Queen')
           end
           
           it 'should not have errors' do
-            pending "create a model that allows for proper testing"
+            @bed.errors.messages.should be_empty
           end
           
           it 'should have been saved' do
-            pending "create a model that allows for proper testing"
+            @bed.should_not be_new_record
           end
         end
       end
