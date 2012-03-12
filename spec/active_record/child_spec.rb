@@ -1,75 +1,390 @@
 require 'spec_helper'
 
 describe MultipleTableInheritance::Child do
-  context 'retrieving records' do
-    before do
-      programmer = Programmer.create!(:first_name => 'Bob', :last_name => 'Smith', :salary => 50000)
-      @programmer_id = programmer.id
-      @programmer = Programmer.find(@programmer_id)
+  context 'non-namespaced classes with default subtype' do
+    context 'retrieving records' do
+      before do
+        programmer = Programmer.create!(:first_name => 'Bob', :last_name => 'Smith', :salary => 50000)
+        @programmer_id = programmer.id
+        @programmer = Programmer.find(@programmer_id)
+      end
+      
+      it 'should retrieve child records' do
+        @programmer.should be_instance_of(Programmer)
+        @programmer.id.should be(@programmer_id)
+      end
+      
+      it 'should allow access to parent record' do
+        @programmer.employee.should be_instance_of(Employee)
+        @programmer.employee.id.should be(@programmer_id)
+      end
     end
     
-    it 'should retrieve child records' do
-      @programmer.should be_instance_of(Programmer)
-      @programmer.id.should be(@programmer_id)
-    end
-    
-    it 'should allow access to parent record' do
-      @programmer.employee.should be_instance_of(Employee)
-      @programmer.employee.id.should be(@programmer_id)
-    end
-  end
-  
-  context 'creating records' do
-    context 'with mass assignment security' do
-      context 'specifying fields that are accessible' do
-        it 'should assign accessible fields' do
-          pending "create a model that allows for proper testing"
+    context 'creating records' do
+      context 'with mass assignment security' do
+        context 'on just child' do
+          context 'without assigning all attributes' do
+            before(:each) do
+              @shirt = Shirt.create(:color => 'Red')
+            end
+            
+            it 'should have errors' do
+              @shirt.errors.messages.size.should == 1
+              @shirt.errors.messages.keys.should include(:size)
+            end
+            
+            it 'should not have been saved' do
+              @shirt.should be_new_record
+            end
+          end
+          
+          context 'with all attributes assigned' do
+            before(:each) do
+              @shirt = Shirt.create(:color => 'Red', :size => 'XL')
+            end
+            
+            it 'should not have errors' do
+              @shirt.errors.messages.should be_empty
+            end
+            
+            it 'should have been saved' do
+              @shirt.should_not be_new_record
+            end
+          end
         end
         
-        it 'should save child associations' do
-          pending "create a model that allows for proper testing"
+        context 'on just parent' do
+          context 'with attributes set on instance' do
+            before(:each) do
+              # TODO
+            end
+            
+            it 'should not have errors' do
+              pending "create a model that allows for proper testing"
+            end
+            
+            it 'should have been saved' do
+              pending "create a model that allows for proper testing"
+            end
+          end
+          
+          context 'with attributes specified in hash' do
+            before(:each) do
+              # TODO
+            end
+            
+            it 'should assign accessible fields' do
+              pending "create a model that allows for proper testing"
+            end
+            
+            it 'should not assign secure fields' do
+              pending "create a model that allows for proper testing"
+            end
+            
+            it 'should have errors' do
+              pending "create a model that allows for proper testing"
+            end
+            
+            it 'should not have been saved' do
+              pending "create a model that allows for proper testing"
+            end
+          end
         end
         
-        it 'should save parent associations' do
-          pending "create a model that allows for proper testing"
+        context 'on child and parent' do
+          context 'with attributes set on instance' do
+            before(:each) do
+              @programmer = Programmer.create(:first_name => 'Joe', :last_name => 'Schmoe') do |programmer|
+                programmer.team = Team.first
+                programmer.salary = 45000
+              end
+            end
+            
+            it 'should not have errors' do
+              @programmer.errors.messages.should be_empty
+            end
+            
+            it 'should have been saved' do
+              @programmer.should_not be_new_record
+            end
+          end
+          
+          context 'with attributes specified in hash' do
+            before(:each) do
+              @programmer = Programmer.create(:first_name => 'Joe', :last_name => 'Schmoe', :salary => 45000)
+            end
+            
+            it 'should not have errors' do
+              @programmer.errors.messages.should be_empty
+            end
+            
+            it 'should have been saved' do
+              @programmer.should_not be_new_record
+            end
+          end
         end
       end
       
-      context 'specifying fields that are not accessible' do
-        it 'should not assign secure fields' do
-          pending "create a model that allows for proper testing"
+      context 'without mass assignment security' do
+        context 'without assigning all attributes' do
+          before(:each) do
+            @pants = Pants.create(:color => 'Blue', :waist_size => 32)
+          end
+          
+          it 'should have errors' do
+            @pants.errors.messages.size.should == 1
+            @pants.errors.messages.keys.should include(:length)
+          end
+          
+          it 'should not have been saved' do
+            @pants.should be_new_record
+          end
         end
         
-        it 'should not save child associations' do
-          pending "create a model that allows for proper testing"
+        context 'with all attributes assigned' do
+          before(:each) do
+            @pants = Pants.create(:color => 'Blue', :waist_size => 32, :length => 34)
+          end
+          
+          it 'should not have errors' do
+            @pants.errors.messages.should be_empty
+          end
+          
+          it 'should have been saved' do
+            @pants.should_not be_new_record
+          end
         end
-        
-        it 'should not save parent associations' do
-          pending "create a model that allows for proper testing"
-        end
+      end
+    end
+    
+    context 'updating records' do
+      pending "todo"
+    end
+    
+    context 'deleting records' do
+      before do
+        mock_employees!
+        @programmer = Programmer.first
+        @programmer_id = @programmer.id
+      end
+      
+      it 'should delete the parent record' do
+        @programmer.destroy
+        Employee.find_by_id(@programmer_id).should be_nil
+      end
+      
+      it 'should delete the child record' do
+        @programmer.destroy.should be_true
+        Programmer.find_by_id(@programmer_id).should be_nil
       end
     end
   end
   
-  context 'updating records' do
-    pending "todo"
-  end
-  
-  context 'deleting records' do
-    before do
-      mock_employees!
-      @programmer = Programmer.first
-      @programmer_id = @programmer.id
+  context 'namespaced classes with custom subtype' do
+    context 'retrieving records' do
+      before do
+        mock_pets!
+        @dog = Pet::Dog.first
+        @dog_id = @dog.id
+      end
+      
+      it 'should retrieve child records' do
+        @dog.should be_instance_of(Pet::Dog)
+        @dog.id.should be(@dog_id)
+      end
+      
+      it 'should allow access to parent record' do
+        @dog.pet.should be_instance_of(Pet::Pet)
+        @dog.pet.id.should be(@dog_id)
+      end
     end
     
-    it 'should delete the parent record' do
-      @programmer.destroy
-      Employee.find_by_id(@programmer_id).should be_nil
+    context 'creating records' do
+      before(:each) do
+        @owner = Pet::Owner.create!(:first_name => 'Bob', :last_name => 'Smith') { |owner| owner.ssn = '123456789' }
+      end
+      
+      context 'with mass assignment security' do
+        context 'on just child' do
+          context 'with attributes set on instance' do
+            before(:each) do
+              # TODO
+            end
+            
+            it 'should not have errors' do
+              pending "create a model that allows for proper testing"
+            end
+            
+            it 'should have been saved' do
+              pending "create a model that allows for proper testing"
+            end
+          end
+          
+          context 'with attributes specified in hash' do
+            before(:each) do
+              # TODO
+            end
+            
+            it 'should assign accessible fields' do
+              pending "create a model that allows for proper testing"
+            end
+            
+            it 'should not assign secure fields' do
+              pending "create a model that allows for proper testing"
+            end
+            
+            it 'should save child associations' do
+              pending "create a model that allows for proper testing"
+            end
+            
+            it 'should save parent associations' do
+              pending "create a model that allows for proper testing"
+            end
+          end
+        end
+        
+        context 'on just parent' do
+          context 'with attributes set on instance' do
+            before(:each) do
+              @dog = Pet::Dog.create(:name => 'Fido') do |dog|
+                dog.owner = @owner
+                dog.color = 'black'
+                dog.favorite_toy = 'Squeeky Ball'
+              end
+            end
+            
+            it 'should not have errors' do
+              @dog.errors.messages.should be_empty
+            end
+            
+            it 'should have been saved' do
+              @dog.should_not be_new_record
+            end
+          end
+          
+          context 'with attributes specified in hash' do
+            before(:each) do
+              owner = Pet::Owner.create!(:first_name => 'Bob', :last_name => 'Smith') { |owner| owner.ssn = '123456789' }
+              @dog = Pet::Dog.create(:name => 'Fido', :color => 'black', :owner => @owner, :favorite_toy => 'Squeeky Ball')
+            end
+            
+            it 'should assign accessible fields' do
+              @dog.name.should be_present
+            end
+            
+            it 'should not assign secure fields' do
+              @dog.color.should_not be_present
+              @dog.owner.should_not be_present
+              @dog.owner_id.should_not be_present
+              @dog.favorite_toy.should_not be_present
+            end
+            
+            it 'should have errors' do
+              @dog.errors.messages.should_not be_empty
+            end
+            
+            it 'should not have been saved' do
+              @dog.should be_new_record
+            end
+          end
+        end
+        
+        context 'on child and parent' do
+          context 'with attributes set on instance' do
+            before(:each) do
+              @cat = Pet::Cat.create(:name => 'Mittens', :longest_nap => 100) do |cat|
+                cat.owner = @owner
+                cat.color = 'orange'
+              end
+            end
+            
+            it 'should not have errors' do
+              @cat.errors.messages.should be_empty
+            end
+            
+            it 'should have been saved' do
+              @cat.should_not be_new_record
+            end
+          end
+          
+          context 'with attributes specified in hash' do
+            before(:each) do
+              @cat = Pet::Cat.create(:name => 'Fido', :color => 'black', :owner => @owner, :longest_nap => 50)
+            end
+            
+            it 'should assign accessible fields' do
+              @cat.name.should be_present
+              @cat.longest_nap.should be_present
+            end
+            
+            it 'should not assign secure fields' do
+              @cat.color.should_not be_present
+              @cat.owner.should_not be_present
+              @cat.owner_id.should_not be_present
+            end
+            
+            it 'should have errors' do
+              @cat.errors.messages.should_not be_empty
+            end
+            
+            it 'should not have been saved' do
+              @cat.should be_new_record
+            end
+          end
+        end
+      end
+      
+      context 'without mass assignment security' do
+        context 'with attributes set on instance' do
+          before(:each) do
+            # TODO
+          end
+          
+          it 'should not have errors' do
+            pending "create a model that allows for proper testing"
+          end
+          
+          it 'should have been saved' do
+            pending "create a model that allows for proper testing"
+          end
+        end
+        
+        context 'with attributes specified in hash' do
+          before(:each) do
+            # TODO
+          end
+          
+          it 'should not have errors' do
+            pending "create a model that allows for proper testing"
+          end
+          
+          it 'should have been saved' do
+            pending "create a model that allows for proper testing"
+          end
+        end
+      end
     end
     
-    it 'should delete the child record' do
-      @programmer.destroy.should be_true
-      Programmer.find_by_id(@programmer_id).should be_nil
+    context 'updating records' do
+      pending "todo"
+    end
+    
+    context 'deleting records' do
+      before do
+        mock_employees!
+        @programmer = Programmer.first
+        @programmer_id = @programmer.id
+      end
+      
+      it 'should delete the parent record' do
+        @programmer.destroy
+        Employee.find_by_id(@programmer_id).should be_nil
+      end
+      
+      it 'should delete the child record' do
+        @programmer.destroy.should be_true
+        Programmer.find_by_id(@programmer_id).should be_nil
+      end
     end
   end
   

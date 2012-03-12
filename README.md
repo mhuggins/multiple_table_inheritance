@@ -21,14 +21,19 @@ How to Install
 
 From the command line:
 
-    gem install multiple-table-inheritance
+    gem install multiple_table_inheritance
 
 From your Gemfile:
 
-    gem 'multiple_table_inheritance', '~> 0.1.3'
+    gem 'multiple_table_inheritance', '~> 0.1.4'
 
 Usage
 =====
+
+The following sections attempt to explain full coverage for the Multiple Table
+Inheritance plugin.  For full code examples, take a look at the test database
+structure and associated models found in `spec/support/tables.rb` and
+`spec/support/models.rb`, respectively.
 
 Running Migrations
 ------------------
@@ -46,8 +51,10 @@ that this column be non-null for sanity.
       t.timestamps
     end
 
-When creating tables that are derived from your superclass table, simple
-provide the `:inherits` hash option to your `create_table` call.
+When creating tables that are derived from your superclass table, simply
+provide the `:inherits` hash option to your `create_table` call.  The value of
+the option represent the name by which the association is referenced in your
+model.
 
     create_table :programmers, :inherits => :employee do |t|
       t.datetime :training_completed_at
@@ -98,6 +105,11 @@ to `inherits_from`.  (Presently, this has only be tested to work with the
 Creating Records
 ----------------
 
+Records can be created directly from their inheriting (child) model classes.
+Given model names `Employee`, `Programmer`, and `Manager` based upon the table
+structures outlined in the "Running Migrations" section, records can be created
+in the following manner.
+
     Programmer.create(
         :first_name => 'Bob',
         :last_name => 'Smith',
@@ -144,18 +156,18 @@ Validation
 When creating a new record that inherits from another model, validation is
 taken into consideration across both models.
 
-    class ::Employee < ActiveRecord::Base
+    class Employee < ActiveRecord::Base
       acts_as_superclass
       validates :first_name, :presence => true
       validates :last_name, :presence => true
       validates :salary, :presence => true, :numericality => { :min => 0 }
     end
     
-    class ::Programmer < ActiveRecord::Base
+    class Programmer < ActiveRecord::Base
       inherits_from :employee
     end
     
-    class ::Manager < ActiveRecord::Base
+    class Manager < ActiveRecord::Base
       inherits_from :employee
       validates :bonus, :presence => true, :numericality => true
     end
@@ -181,12 +193,6 @@ for a normal ActiveRecord model.
       inherits_from :employee
       attr_accessible :bonus
     end
-
-**NOTE:** When an ActiveRecord model does not make a call to `attr_accessible`,
-all its fields are presumed to be accessible.  Currently, when using
-MultipleTableInheritance, if a parent class does not call `attr_accesible` and
-one of its children does, then the parent's attributes cannot properly be
-stored.  This will be fixed in a future release.
 
 Associations
 ------------

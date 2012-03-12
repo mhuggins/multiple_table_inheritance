@@ -1,6 +1,6 @@
-###############################################
-# Non-namespaced models
-###############################################
+#########################################################
+# Non-namespaced models with mass-assignment security
+#########################################################
 
 class Employee < ActiveRecord::Base
   acts_as_superclass
@@ -44,9 +44,31 @@ class KnownLanguage < ActiveRecord::Base
   validates :language_id, :presence => true, :uniqueness => { :scope => :programmer_id }
 end
 
-###############################################
-# Namespaced models
-###############################################
+#########################################################
+# Non-namespaced models with mass assignment security
+# only on children or not specified
+#########################################################
+
+class Clothing < ActiveRecord::Base
+  acts_as_superclass
+  validates :color, :presence => true
+end
+
+class Shirt < ActiveRecord::Base
+  inherits_from :clothing
+  attr_accessible :size
+  validates :size, :presence => true
+end
+
+class Pants < ActiveRecord::Base
+  inherits_from :clothing
+  validates :waist_size, :presence => true
+  validates :length, :presence => true
+end
+
+#########################################################
+# Namespaced models with mass assignment security
+#########################################################
 
 module Pet
   def self.table_name_prefix
@@ -71,9 +93,17 @@ module Pet
   
   class Cat < ActiveRecord::Base
     inherits_from :pet, :class_name => 'Pet::Pet'
+    attr_accessible :longest_nap
   end
   
   class Dog < ActiveRecord::Base
     inherits_from :pet, :class_name => 'Pet::Pet'
   end
 end
+
+#########################################################
+# Namespaced models with mass assignment security
+# only on children or not specified
+#########################################################
+
+# TODO

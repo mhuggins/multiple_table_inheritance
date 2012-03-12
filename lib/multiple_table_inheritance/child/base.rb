@@ -39,6 +39,9 @@ module MultipleTableInheritance
             attr_accessible attr.to_sym
           end
           
+          # Sanitize attributes across parent and child
+          self.mass_assignment_sanitizer = Child::Sanitizer.new(self)
+          
           # Bind relationship, handle validation, and save properly.
           belongs_to parent_association_name, options
           alias_method_chain parent_association_name, :autobuild
@@ -47,12 +50,12 @@ module MultipleTableInheritance
           before_save :parent_association_must_be_saved
         end
         
-        private
-        
         def parent_association_class
           reflection = create_reflection(:belongs_to, parent_association_name, {}, self)
           reflection.klass
         end
+        
+        private
         
         def inherited_columns_and_associations
           # Get the associated columns and relationship names

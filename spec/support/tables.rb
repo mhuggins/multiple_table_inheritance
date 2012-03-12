@@ -43,6 +43,24 @@ conn.create_table :known_languages do |t|
 end
 
 #########################################################
+# Clothing entities
+#########################################################
+
+conn.create_table :clothings do |t|
+  t.string :subtype, :null => false
+  t.string :color, :null => false
+end
+
+conn.create_table :shirts, :inherits => :clothing do |t|
+  t.string :size, :limit => 2, :null => false
+end
+
+conn.create_table :pants, :inherits => :clothing do |t|
+  t.integer :waist_size, :null => false
+  t.integer :length, :null => false
+end
+
+#########################################################
 # Pet entities
 #########################################################
 

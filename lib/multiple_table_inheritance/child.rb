@@ -3,5 +3,6 @@ module MultipleTableInheritance
     extend ActiveSupport::Autoload
     
     autoload :Base
+    autoload :Sanitizer
   end
 end
