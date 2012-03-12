@@ -3,7 +3,7 @@ db_file = File.join(db_path, 'multiple_table_inheritance.db')
 
 # Create/Overwrite database file
 File.delete(db_file) if File.exist?(db_file)
-Dir.mkdir(db_path) unless Dir.exist?(db_path)
+Dir.mkdir(db_path) unless File.directory?(db_path)
 File.open(db_file, 'w') {}
 
 # Open a database connection
