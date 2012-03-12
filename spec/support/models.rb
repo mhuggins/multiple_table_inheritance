@@ -1,5 +1,6 @@
 #########################################################
 # Non-namespaced models with mass-assignment security
+# everywhere or only on parent.
 #########################################################
 
 class Employee < ActiveRecord::Base
@@ -24,6 +25,10 @@ class Manager < ActiveRecord::Base
   validates :bonus, :numericality => true
 end
 
+class Janitor < ActiveRecord::Base
+  inherits_from :employee
+end
+
 class Team < ActiveRecord::Base
   attr_accessible :name, :description
   has_many :employees
@@ -46,7 +51,7 @@ end
 
 #########################################################
 # Non-namespaced models with mass assignment security
-# only on children or not specified
+# only on children or not specified.
 #########################################################
 
 class Clothing < ActiveRecord::Base
@@ -68,6 +73,7 @@ end
 
 #########################################################
 # Namespaced models with mass assignment security
+# everywhere or only on parent.
 #########################################################
 
 module Pet
@@ -103,7 +109,29 @@ end
 
 #########################################################
 # Namespaced models with mass assignment security
-# only on children or not specified
+# only on children or not specified.
 #########################################################
 
-# TODO
+module Store
+  def self.table_name_prefix
+    'store_'
+  end
+  
+  class Furniture < ActiveRecord::Base
+    acts_as_superclass
+    validates :brand, :presence => true
+    validates :name, :presence => true
+  end
+  
+  class Bed < ActiveRecord::Base
+    inherits_from :furniture, :class_name => 'Store::Furniture'
+    validates :size, :presence => true
+  end
+  
+  class Table < ActiveRecord::Base
+    inherits_from :furniture, :class_name => 'Store::Furniture'
+    attr_accessible :chairs, :color
+    validates :chairs, :presence => true, :numericality => { :min => 1 }
+    validates :color, :presence => true
+  end
+end

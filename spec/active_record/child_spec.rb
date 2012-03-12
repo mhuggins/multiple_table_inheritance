@@ -29,7 +29,7 @@ describe MultipleTableInheritance::Child do
             end
             
             it 'should have errors' do
-              @shirt.errors.messages.size.should == 1
+              @shirt.errors.messages.should_not be_empty
               @shirt.errors.messages.keys.should include(:size)
             end
             
@@ -54,39 +54,32 @@ describe MultipleTableInheritance::Child do
         end
         
         context 'on just parent' do
-          context 'with attributes set on instance' do
+          context 'without assigning all attributes' do
             before(:each) do
-              # TODO
-            end
-            
-            it 'should not have errors' do
-              pending "create a model that allows for proper testing"
-            end
-            
-            it 'should have been saved' do
-              pending "create a model that allows for proper testing"
-            end
-          end
-          
-          context 'with attributes specified in hash' do
-            before(:each) do
-              # TODO
-            end
-            
-            it 'should assign accessible fields' do
-              pending "create a model that allows for proper testing"
-            end
-            
-            it 'should not assign secure fields' do
-              pending "create a model that allows for proper testing"
+              @janitor = Janitor.create(:first_name => 'Billy', :last_name => 'McGee')
             end
             
             it 'should have errors' do
-              pending "create a model that allows for proper testing"
+              @janitor.errors.messages.should_not be_empty
+              @janitor.errors.messages.keys.should include(:salary)
             end
             
             it 'should not have been saved' do
-              pending "create a model that allows for proper testing"
+              @janitor.should be_new_record
+            end
+          end
+          
+          context 'with all attributes assigned' do
+            before(:each) do
+              @janitor = Janitor.create(:first_name => 'Billy', :last_name => 'McGee', :salary => 40000, :favorite_cleaner => 'Swiffer')
+            end
+            
+            it 'should not have errors' do
+              @janitor.errors.messages.should be_empty
+            end
+            
+            it 'should have been saved' do
+              @janitor.should_not be_new_record
             end
           end
         end
@@ -132,7 +125,7 @@ describe MultipleTableInheritance::Child do
           end
           
           it 'should have errors' do
-            @pants.errors.messages.size.should == 1
+            @pants.errors.messages.should_not be_empty
             @pants.errors.messages.keys.should include(:length)
           end
           
@@ -206,39 +199,32 @@ describe MultipleTableInheritance::Child do
       
       context 'with mass assignment security' do
         context 'on just child' do
-          context 'with attributes set on instance' do
+          context 'without assigning all attributes' do
             before(:each) do
-              # TODO
+              @bed = Store::Bed.create(:brand => 'Sealy', :name => 'Feathertop')
             end
             
-            it 'should not have errors' do
-              pending "create a model that allows for proper testing"
+            it 'should have errors' do
+              @bed.errors.messages.should_not be_empty
+              @bed.errors.messages.keys.should include(:size)
             end
             
-            it 'should have been saved' do
-              pending "create a model that allows for proper testing"
+            it 'should not have been saved' do
+              @bed.should be_new_record
             end
           end
           
-          context 'with attributes specified in hash' do
+          context 'with all attributes assigned' do
             before(:each) do
-              # TODO
+              @bed = Store::Bed.create(:brand => 'Sealy', :name => 'Feathertop', :size => 'Queen')
             end
             
-            it 'should assign accessible fields' do
-              pending "create a model that allows for proper testing"
+            it 'should not have errors' do
+              @bed.errors.messages.should be_empty
             end
             
-            it 'should not assign secure fields' do
-              pending "create a model that allows for proper testing"
-            end
-            
-            it 'should save child associations' do
-              pending "create a model that allows for proper testing"
-            end
-            
-            it 'should save parent associations' do
-              pending "create a model that allows for proper testing"
+            it 'should have been saved' do
+              @bed.should_not be_new_record
             end
           end
         end

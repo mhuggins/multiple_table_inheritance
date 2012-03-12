@@ -29,6 +29,10 @@ conn.create_table :managers, :inherits => :employee do |t|
   t.integer :bonus
 end
 
+conn.create_table :janitors, :inherits => :employee do |t|
+  t.string :preferred_cleaner
+end
+
 conn.create_table :teams do |t|
   t.string :name, :null => false
 end
@@ -83,4 +87,23 @@ end
 
 conn.create_table :pet_cats, :inherits => :pet do |t|
   t.integer :longest_nap
+end
+
+#########################################################
+# Store entities
+#########################################################
+
+conn.create_table :store_furnitures do |t|
+  t.string :subtype, :null => false
+  t.string :brand, :null => false
+  t.string :name, :null => false
+end
+
+conn.create_table :store_beds, :inherits => :furniture do |t|
+  t.string :size, :null => false
+end
+
+conn.create_table :store_chairs, :inherits => :furniture do |t|
+  t.integer :chairs, :null => false
+  t.string :color, :null => false
 end

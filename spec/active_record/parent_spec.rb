@@ -17,15 +17,15 @@ describe MultipleTableInheritance::Parent do
       end
     
       it 'should retrieve child records' do
-        Employee.find_each do |programmer_or_manager|
-          programmer_or_manager.should_not be_instance_of(Employee)
-          ['Programmer', 'Manager'].should include(programmer_or_manager.class.to_s)
+        Employee.find_each do |employee_subtype|
+          employee_subtype.should_not be_instance_of(Employee)
+          ['Programmer', 'Manager', 'Janitor'].should include(employee_subtype.class.to_s)
         end
       end
     
       it 'should allow access to parent record' do
-        programmer_or_manager = Employee.first
-        programmer_or_manager.employee.should be_instance_of(Employee)
+        employee_subtype = Employee.first
+        employee_subtype.employee.should be_instance_of(Employee)
       end
     
       it 'should include all records' do
@@ -43,25 +43,25 @@ describe MultipleTableInheritance::Parent do
       context 'associations preloading' do
         context 'is enabled' do
           before do
-            @programmer_or_manager = Employee.includes(:team).first
+            @employee_subtype = Employee.includes(:team).first
           end
         
           it 'should not perform an extra find' do
             pending "ensure that team is not retrieved from the database"
             Team.any_instance.should_not_receive(:find_by_sql)
-            @programmer_or_manager.employee.team
+            @employee_subtype.employee.team
           end
         end
       
         context 'is disabled' do
           before do
-            @programmer_or_manager = Employee.first
+            @employee_subtype = Employee.first
           end
         
           it 'should not perform an extra find' do
             pending "ensure that team is retrieved from the database"
             Team.any_instance.should_receive(:find_by_sql).at_least(:once)
-            @programmer_or_manager.employee.team
+            @employee_subtype.employee.team
           end
         end
       end
