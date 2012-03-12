@@ -1,6 +1,8 @@
 Multiple Table Inheritance
 ==========================
 
+[![Build Status](https://secure.travis-ci.org/mhuggins/multiple_table_inheritance.png)](http://travis-ci.org/mhuggins/multiple_table_inheritance)
+
 Multiple Table Inheritance is a plugin designed to allow for multiple table
 inheritance between your database tables and your ActiveRecord models.
 
