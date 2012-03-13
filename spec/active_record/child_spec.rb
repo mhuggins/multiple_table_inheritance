@@ -376,20 +376,40 @@ describe MultipleTableInheritance::Child do
     end
   end
   
-  context 'when instructed to inherit parent methods' do
-    it 'should inherit parent methods' do
-      pending "todo"
-    end
-  end
-  
   context 'methods' do
-    before do
-      mock_employees!
+    context 'accessing parent methods' do
+      context 'on models that allow methods to be inherited' do
+        before do
+          mock_employees!
+          @programmer = Programmer.first
+        end
+        
+        it 'should allow parent methods to be called through child' do
+          pending "infinite recursion must be addressed"
+          # @programmer.should respond_to(:give_raise!)
+        end
+      end
+      
+      context 'on models that do not allow methods to be inherited' do
+        before do
+          mock_pets!
+          @cat = Pet::Cat.first
+        end
+        
+        it 'should not allow parent methods to be called through child' do
+          @cat.should_not respond_to(:rename!)
+        end
+      end
     end
     
     context 'accessing parent records' do
       before do
-        @programmer = Programmer.create!(:first_name => 'Bob', :last_name => 'Smith', :salary => 50000)
+        @salary = 50000
+        @programmer = Programmer.create!(:first_name => 'Bob', :last_name => 'Smith', :salary => @salary)
+      end
+      
+      it 'should allow access to parent attribute methods' do
+        @programmer.salary.should == @salary
       end
       
       it 'should allow access to parent records' do
@@ -400,6 +420,10 @@ describe MultipleTableInheritance::Child do
     end
     
     context 'searching by id' do
+      before do
+        mock_employees!
+      end
+      
       context 'at the class level' do
         before do
           @employee_id = Employee.first.id

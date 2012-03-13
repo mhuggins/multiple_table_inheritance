@@ -34,7 +34,7 @@ module MultipleTableInheritanceSpecHelper
           :last_name => "Moore #{i}",
           :salary => 40000 + (i * 1000),
           :team => Team.last,
-          :preferred_cleaner => %w{Comet Windex Swiffer}[i])  # janitor-specific field
+          :preferred_cleaner => %w{Comet Windex Swiffer}[i % 3])  # janitor-specific field
     end
   end
   

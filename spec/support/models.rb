@@ -10,23 +10,27 @@ class Employee < ActiveRecord::Base
   validates :first_name, :presence => true
   validates :last_name, :presence => true
   validates :salary, :presence => true, :numericality => { :min => 0 }
+  
+  def give_raise!(amount)
+    Employee.update_counters self.id, :salary => amount
+  end
 end
 
 class Programmer < ActiveRecord::Base
-  inherits_from :employee
+  inherits_from :employee  #, :methods => true
   attr_accessible :languages, :language_ids
   has_many :known_languages
   has_many :languages, :through => :known_languages
 end
 
 class Manager < ActiveRecord::Base
-  inherits_from :employee
+  inherits_from :employee  #, :methods => true
   attr_accessible :bonus
   validates :bonus, :numericality => true
 end
 
 class Janitor < ActiveRecord::Base
-  inherits_from :employee
+  inherits_from :employee  #, :methods => true
 end
 
 class Team < ActiveRecord::Base
@@ -95,6 +99,10 @@ module Pet
     belongs_to :owner
     validates :owner_id, :presence => true
     validates :name, :presence => true
+    
+    def rename!(new_name)
+      update_attributes!(:name => new_name)
+    end
   end
   
   class Cat < ActiveRecord::Base

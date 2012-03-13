@@ -31,7 +31,7 @@ module MultipleTableInheritance
             child.delete
           end
         rescue NameError => e
-          # TODO log error
+          logger.warn "Can't find matching child association for deletion: #{self.class} ##{id}" if logger
         end
         
         def find_by_subtype(*args)

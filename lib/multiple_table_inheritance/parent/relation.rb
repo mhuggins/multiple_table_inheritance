@@ -19,7 +19,7 @@ module MultipleTableInheritance
             klass = type.constantize
             child_records += klass.find(ids)
           rescue NameError => e
-            # TODO log error
+            logger.warn "Can't find matching child association for deletion: #{type} #{ids.inspect}" if logger
           end
         end
         

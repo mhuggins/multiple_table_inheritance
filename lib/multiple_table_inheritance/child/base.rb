@@ -2,7 +2,7 @@ module MultipleTableInheritance
   module Child
     module Base
       def self.default_options
-        { :dependent => :destroy, :inherit_methods => false }
+        { :dependent => :destroy, :methods => false }
       end
       
       def self.included(base)
@@ -14,7 +14,7 @@ module MultipleTableInheritance
         def inherits_from(association_name, options={})
           # Standardize options, and remove those that should not affect the belongs_to relationship
           options = Base::default_options.merge(options.to_options)
-          inherit_methods = options.delete(:inherit_methods)
+          inherit_methods = options.delete(:methods)
           
           extend FinderMethods, SharedMethods
           include InstanceMethods, SharedMethods
@@ -131,18 +131,17 @@ module MultipleTableInheritance
       end
       
       module DelegateMethods
-        private
-        
-        def method_missing(name, *args)
+        def method_missing(name, *args, &block)
           if parent_association.respond_to?(name)
-            parent_association.public_send(name, *args)
+            parent_association.send(name, *args, &block)
           else
-            super(name, *args)
+            super(name, *args, &block)
           end
         end
         
-        def respond_to?(name)
-          parent_association.respond_to?(name) || super
+        def respond_to?(name, *args)
+          return true if name.to_sym == :parent_association
+          super(name, *args) || parent_association.respond_to?(name)
         end
       end
     end
