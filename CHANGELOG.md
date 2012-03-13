@@ -1,6 +1,13 @@
+0.1.4
+
+* Fixed mass assignment when security is only defined in child model.
+* Added support for namespaced models.
+* Added many more unit tests.
+
 0.1.3
 
 * Fixed a bug that prevented migrations from being run properly.
+* Added several unit tests.
 
 0.1.2
 

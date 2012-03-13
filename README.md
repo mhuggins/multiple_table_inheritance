@@ -25,7 +25,7 @@ From the command line:
 
 From your Gemfile:
 
-    gem 'multiple_table_inheritance', '~> 0.1.3'
+    gem 'multiple_table_inheritance', '~> 0.1.4'
 
 Usage
 =====
@@ -228,3 +228,31 @@ Associations will also work in the same way as other attributes.
     programmer = Programmer.first           # <Programmer employee_id: 1 training_completed_at: "2009-03-06 00:30:00">
     programmer.languages.collect(&:name)    # ['Java', 'C++']
     programmer.team.name                    # 'Website Front-End'
+
+Methods
+-------
+
+When inheriting from another parent model, methods can optionally be called on
+the parent model automatically as well.  To do so, specify the `:methods`
+option when calling `inherits_from`.
+
+    class Employee < ActiveRecord::Base
+      acts_as_superclass
+      belongs_to :team
+      
+      def give_raise!(amount)
+        update_attribute!(:salary, self.salary + amount)
+        puts "Congrats on your well-deserved raise, #{self.first_name}!"
+      end
+    end
+    
+    class Programmer < ActiveRecord::Base
+      inherits_from :employee, :methods => true
+    end
+    
+    @programmer = Programmer.first
+    @programmer.give_raise!
+    # yields: "Congrats on your well-deserved raise, Mike!"
+
+NOTE: This is not fully implemented yet as of version 0.1.4.  Please wait until
+a future release to prior to using this feature.
