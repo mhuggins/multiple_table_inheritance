@@ -1,3 +1,5 @@
+require 'activemodel/mass_assignment_security/sanitizer' unless defined?(ActiveModel::MassAssignmentSecurity::LoggerSanitizer)
+
 module MultipleTableInheritance
   module Child
     class Sanitizer < ActiveModel::MassAssignmentSecurity::LoggerSanitizer
