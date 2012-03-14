@@ -1,3 +1,7 @@
+0.1.5
+
+* Fix issue with LoggerSanitizer not being defined in Rails projects.
+
 0.1.4
 
 * Fixed mass assignment when security is only defined in child model.
