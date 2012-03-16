@@ -1,3 +1,9 @@
+0.1.6
+
+* Fix issue with mass assignment sanitizer classes not being loaded
+  consistently across different versions of Rails 3.
+* Added several unit tests.
+
 0.1.5
 
 * Fix issue with LoggerSanitizer not being defined in Rails projects.
