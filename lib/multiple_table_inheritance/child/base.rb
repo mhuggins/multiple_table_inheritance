@@ -39,9 +39,6 @@ module MultipleTableInheritance
             attr_accessible attr.to_sym
           end
           
-          # Sanitize attributes across parent and child
-          self.mass_assignment_sanitizer = Child::Sanitizer.new(self)
-          
           # Bind relationship, handle validation, and save properly.
           belongs_to parent_association_name, options
           alias_method_chain parent_association_name, :autobuild
@@ -94,6 +91,12 @@ module MultipleTableInheritance
       end
       
       module InstanceMethods
+        protected
+        
+        def sanitize_for_mass_assignment(attributes, role = :default)
+          Child::Sanitizer.new(self.class, role).sanitize(attributes)
+        end
+        
         private
         
         def parent_association

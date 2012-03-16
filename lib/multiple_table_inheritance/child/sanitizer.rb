@@ -1,20 +1,38 @@
-require 'activemodel/mass_assignment_security/sanitizer' unless defined?(ActiveModel::MassAssignmentSecurity::LoggerSanitizer)
-
 module MultipleTableInheritance
   module Child
-    class Sanitizer < ActiveModel::MassAssignmentSecurity::LoggerSanitizer
-      def initialize(target)
+    class Sanitizer
+      def initialize(target, role)
         @target = target
+        @role = role
         super
       end
       
-      def sanitize(attributes, authorizer)
+      def sanitize(attributes)
         sanitized_attributes = attributes.reject { |key, value| deny?(key) }
         debug_protected_attribute_removal(attributes, sanitized_attributes)
         sanitized_attributes
       end
       
     protected
+      
+      def debug_protected_attribute_removal(attributes, sanitized_attributes)
+        removed_keys = attributes.keys - sanitized_attributes.keys
+        process_removed_attributes(removed_keys) if removed_keys.any?
+      end
+      
+    private
+      
+      def logger
+        @target.logger
+      end
+      
+      def logger?
+        @target.respond_to?(:logger) && @target.logger
+      end
+      
+      def process_removed_attributes(attrs)
+        logger.warn "Can't mass-assign protected attributes: #{attrs.join(', ')}" if logger?
+      end
       
       def deny?(key)
         return true if protected_attribute?(key)
@@ -32,19 +50,27 @@ module MultipleTableInheritance
       end
       
       def protected_attributes
-        @protected_attributes ||= (@target.protected_attributes + @target.parent_association_class.protected_attributes)
+        @protected_attributes ||= (protected_child_attributes + protected_parent_attributes)
       end
       
       def accessible_attributes
-        @accessible_attributes ||= (@target.accessible_attributes + @target.parent_association_class.accessible_attributes)
+        @accessible_attributes ||= (accessible_child_attributes + accessible_parent_attributes)
+      end
+      
+      def protected_child_attributes
+        @protected_child_attributes ||= @target.protected_attributes(@role)
+      end
+      
+      def protected_parent_attributes
+        @protected_parent_attributes ||= @target.parent_association_class.protected_attributes(@role)
       end
       
       def accessible_child_attributes
-        @accessible_child_attributes ||= @target.accessible_attributes
+        @accessible_child_attributes ||= @target.accessible_attributes(@role)
       end
       
       def accessible_parent_attributes
-        @accessible_parent_attributes ||= @target.parent_association_class.accessible_attributes
+        @accessible_parent_attributes ||= @target.parent_association_class.accessible_attributes(@role)
       end
       
       def child_attribute_names
