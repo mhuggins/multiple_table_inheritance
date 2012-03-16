@@ -48,8 +48,10 @@ module MultipleTableInheritance
         end
         
         def parent_association_class
-          reflection = create_reflection(:belongs_to, parent_association_name, {}, self)
-          reflection.klass
+          @parent_association_class ||= begin
+            reflection = create_reflection(:belongs_to, parent_association_name, {}, self)
+            reflection.klass
+          end
         end
         
         private
@@ -77,9 +79,12 @@ module MultipleTableInheritance
         def find_by_sql(*args)
           child_records = super(*args)
           
+          ids = child_records.collect(&:id)
+          parent_records = parent_association_class.as_supertype.find_all_by_id(ids)
+          
           child_records.each do |child|
-            parent = parent_association_class.as_supertype.find_by_id(child.id)
-            child.send(:parent_association=, parent)
+            parent = parent_records.find { |parent| parent.id == child.id }
+            child.send(:parent_association=, parent) if parent
           end
         end
       end
