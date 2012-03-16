@@ -1,3 +1,7 @@
+0.1.7
+
+* Fix bug caused by extraneous super call in sanitizer class.
+
 0.1.6
 
 * Fix issue with mass assignment sanitizer classes not being loaded

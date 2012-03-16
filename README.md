@@ -25,7 +25,7 @@ From the command line:
 
 From your Gemfile:
 
-    gem 'multiple_table_inheritance', '~> 0.1.6'
+    gem 'multiple_table_inheritance', '~> 0.1.7'
 
 Usage
 =====
@@ -254,5 +254,5 @@ option when calling `inherits_from`.
     @programmer.give_raise!
     # yields: "Congrats on your well-deserved raise, Mike!"
 
-NOTE: This is not fully implemented yet as of version 0.1.6.  Please wait until
+NOTE: This is not fully implemented yet as of version 0.1.7.  Please wait until
 a future release to prior to using this feature.
