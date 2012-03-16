@@ -4,7 +4,6 @@ module MultipleTableInheritance
       def initialize(target, role)
         @target = target
         @role = role
-        super
       end
       
       def sanitize(attributes)
