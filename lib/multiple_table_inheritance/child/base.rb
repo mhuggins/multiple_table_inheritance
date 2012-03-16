@@ -58,13 +58,8 @@ module MultipleTableInheritance
         
         def inherited_columns_and_associations
           # Get the associated columns and relationship names
-          inherited_columns = parent_association_class.column_names
+          inherited_columns = parent_association_class.column_names - column_names
           inherited_methods = parent_association_class.reflections.map { |key, value| key.to_s }
-          
-          # Filter out columns that the class already has
-          # inherited_columns = inherited_columns.reject do |column|
-          #   (self.column_names.grep(column).length > 0) || (column == 'type') || (column == parent_association_class.subtype_column)
-          # end
           
           # Filter out methods that the class already has
           inherited_methods = inherited_methods.reject do |method|
