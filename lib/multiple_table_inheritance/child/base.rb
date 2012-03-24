@@ -16,7 +16,9 @@ module MultipleTableInheritance
           options = Base::default_options.merge(options.to_options)
           inherit_methods = options.delete(:methods)
           
-          extend FinderMethods, SharedMethods
+          @inherited_attribute_methods_mutex = Mutex.new
+          
+          extend AttributeMethods, FinderMethods, SharedMethods
           include InstanceMethods, SharedMethods
           include DelegateMethods if inherit_methods
           
@@ -29,22 +31,15 @@ module MultipleTableInheritance
             send("#{parent_association_name}_without_autobuild") || send("build_#{parent_association_name}")
           end
           
-          # Allow getting and setting of parent attributes and relationships.
-          inherited_columns_and_associations.each do |name|
-            delegate name, "#{name}=", :to => parent_association_name
-          end
-          
-          # Ensure parent's accessible attributes are accessible in child.
-          parent_association_class.accessible_attributes.each do |attr|
-            attr_accessible attr.to_sym
-          end
-          
           # Bind relationship, handle validation, and save properly.
           belongs_to parent_association_name, options
           alias_method_chain parent_association_name, :autobuild
           before_validation :set_association_subtype
           validate :parent_association_must_be_valid
           before_save :parent_association_must_be_saved
+          
+          # denote that the association methods have not been built
+          @loaded = false
         end
         
         def parent_association_class
@@ -67,6 +62,39 @@ module MultipleTableInheritance
           end
           
           inherited_columns + inherited_methods - ['id']
+        end
+      end
+      
+      module AttributeMethods
+        def define_attribute_methods
+          super
+          
+          @inherited_attribute_methods_mutex.synchronize do
+            return if inherited_attribute_methods_generated?
+            inherit_parent_attributes
+            inherit_parent_accessible_attributes
+            inherited_attribute_methods_generated!
+          end
+        end
+        
+        def inherit_parent_attributes
+          inherited_columns_and_associations.each do |name|
+            delegate name, "#{name}=", :to => parent_association_name
+          end
+        end
+        
+        def inherit_parent_accessible_attributes
+          parent_association_class.accessible_attributes.each do |attr|
+            attr_accessible attr.to_sym
+          end
+        end
+        
+        def inherited_attribute_methods_generated?
+          @inherited_attribute_methods_generated ||= false
+        end
+        
+        def inherited_attribute_methods_generated!
+          @inherited_attribute_methods_generated = true
         end
       end
       
@@ -130,6 +158,11 @@ module MultipleTableInheritance
           association = parent_association
           association.save(:validate => false)
           self.id = association.id
+        end
+        
+        def method_missing(*args)
+          self.class.loadyloadload! unless self.class.loadyloadloaded?
+          super
         end
       end
       

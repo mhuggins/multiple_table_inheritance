@@ -25,7 +25,7 @@ From the command line:
 
 From your Gemfile:
 
-    gem 'multiple_table_inheritance', '~> 0.1.7'
+    gem 'multiple_table_inheritance', '~> 0.1.8'
 
 Usage
 =====
@@ -236,6 +236,9 @@ When inheriting from another parent model, methods can optionally be called on
 the parent model automatically as well.  To do so, specify the `:methods`
 option when calling `inherits_from`.
 
+NOTE: This is not fully implemented yet as of version 0.1.8.  Please wait until
+a future release to prior to using this feature.
+
     class Employee < ActiveRecord::Base
       acts_as_superclass
       belongs_to :team
@@ -253,6 +256,3 @@ option when calling `inherits_from`.
     @programmer = Programmer.first
     @programmer.give_raise!
     # yields: "Congrats on your well-deserved raise, Mike!"
-
-NOTE: This is not fully implemented yet as of version 0.1.7.  Please wait until
-a future release to prior to using this feature.

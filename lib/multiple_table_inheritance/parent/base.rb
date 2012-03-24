@@ -17,10 +17,35 @@ module MultipleTableInheritance
           options = Base::default_options.merge(options.to_options)
           self.subtype_column = options[:subtype]
           
+          @child_attribute_methods_mutex = Mutex.new
+          extend AttributeMethods
+        end
+      end
+      
+      module AttributeMethods
+        def define_attribute_methods
+          super
+          
+          @child_attribute_methods_mutex.synchronize do
+            return if child_attribute_methods_generated?
+            extend_child_association
+            child_attribute_methods_generated!
+          end
+        end
+        
+        def extend_child_association
           if column_names.include?(subtype_column.to_s)
             include InstanceMethods
             before_destroy :destroy_child_association
           end
+        end
+        
+        def child_attribute_methods_generated?
+          @child_attribute_methods_generated ||= false
+        end
+        
+        def child_attribute_methods_generated!
+          @child_attribute_methods_generated = true
         end
       end
       

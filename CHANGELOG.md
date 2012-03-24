@@ -1,3 +1,9 @@
+0.1.8
+
+* Fix bug where rake commands cannot be run if `inherits_from` or
+  `acts_as_superclass` have been called within an ActiveRecord model and the
+  model's tables do not already exist.
+
 0.1.7
 
 * Fix bug caused by extraneous super call in sanitizer class.

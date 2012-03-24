@@ -4,8 +4,9 @@ require 'multiple_table_inheritance'
 
 MultipleTableInheritance::Railtie.insert
 
-require 'support/tables'
+require 'support/database'
 require 'support/models'
+require 'support/tables'
 
 module MultipleTableInheritanceSpecHelper
   def mock_employees!
