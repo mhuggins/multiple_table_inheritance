@@ -1,3 +1,7 @@
+0.1.9
+
+* Remove broken code accidentally included during testing.
+
 0.1.8
 
 * Fix bug where rake commands cannot be run if `inherits_from` or

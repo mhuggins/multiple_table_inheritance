@@ -159,11 +159,6 @@ module MultipleTableInheritance
           association.save(:validate => false)
           self.id = association.id
         end
-        
-        def method_missing(*args)
-          self.class.loadyloadload! unless self.class.loadyloadloaded?
-          super
-        end
       end
       
       module DelegateMethods
