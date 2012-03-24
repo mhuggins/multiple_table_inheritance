@@ -97,3 +97,29 @@ conn.create_table :store_tables, :inherits => :furniture do |t|
   t.integer :chairs, :null => false
   t.string :color, :null => false
 end
+
+#########################################################
+# Store entities
+#########################################################
+
+conn.create_table :users do |t|
+  t.string :username, :null => false
+end
+
+conn.create_table :images do |t|
+  t.string :url, :null => false
+end
+
+conn.create_table :advertisements do |t|
+  t.string :subtype, :null => false
+  t.integer :user_id, :null => false
+end
+
+conn.create_table :image_advertisements, :inherits => :advertisement do |t|
+  t.integer :image_id, :null => false
+end
+
+conn.create_table :text_advertisements, :inherits => :advertisement do |t|
+  t.string :title, :null => false
+  t.string :body, :null => false
+end

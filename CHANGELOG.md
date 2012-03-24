@@ -1,3 +1,9 @@
+0.1.10
+
+* Fix issue with sanitizer not allowing relationships to be set when mass
+  assignment security is not specified.
+* Added unit tests specific to the above issue.
+
 0.1.9
 
 * Remove broken code accidentally included during testing.
@@ -7,6 +13,8 @@
 * Fix bug where rake commands cannot be run if `inherits_from` or
   `acts_as_superclass` have been called within an ActiveRecord model and the
   model's tables do not already exist.
+* Update order of loading test to ensure models can be loaded before tables
+  exist.
 
 0.1.7
 

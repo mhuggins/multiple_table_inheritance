@@ -73,11 +73,19 @@ module MultipleTableInheritance
       end
       
       def child_attribute_names
-        @child_attribute_names ||= @target.attribute_names
+        @child_attribute_names ||= begin
+          columns = @target.attribute_names
+          associations = @target.reflections.map { |key, value| key.to_s }
+          columns + associations
+        end
       end
       
       def parent_attribute_names
-        @parent_attribute_names ||= @target.parent_association_class.attribute_names
+        @parent_attribute_names ||= begin
+          columns = @target.parent_association_class.attribute_names
+          associations = @target.parent_association_class.reflections.map { |key, value| key.to_s }
+          columns + associations
+        end
       end
     end
   end

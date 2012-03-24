@@ -147,6 +147,30 @@ describe MultipleTableInheritance::Child do
             @pants.should_not be_new_record
           end
         end
+        
+        context 'with relationships' do
+          before(:each) do
+            @user = User.create!(:username => 'bob')
+            @image = Image.create(:url => 'https://www.google.com/images/srpr/logo3w.png')
+            @advertisement = ImageAdvertisement.create(:user => @user, :image => @image)
+          end
+          
+          it 'should not have errors' do
+            @advertisement.errors.messages.should be_empty
+          end
+          
+          it 'should have been saved' do
+            @advertisement.should_not be_new_record
+          end
+          
+          it 'should have correct user_id' do
+            @advertisement.user_id.should == @user.id
+          end
+          
+          it 'should have correct image_id' do
+            @advertisement.image_id.should == @image.id
+          end
+        end
       end
     end
     

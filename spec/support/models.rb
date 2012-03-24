@@ -143,3 +143,34 @@ module Store
     validates :color, :presence => true
   end
 end
+
+#########################################################
+# Model that includes relationships on both child and
+# parent with no mass assignment security defined.
+#########################################################
+
+class User < ActiveRecord::Base
+  validates :username, :presence => true, :uniqueness => true
+end
+
+class Image < ActiveRecord::Base
+  validates :url, :presence => true
+end
+
+class Advertisement < ActiveRecord::Base
+  acts_as_superclass
+  belongs_to :user
+  validates :user, :presence => true
+end
+
+class ImageAdvertisement < ActiveRecord::Base
+  inherits_from :advertisement
+  belongs_to :image
+  validates :image, :presence => true
+end
+
+class TextAdvertisement < ActiveRecord::Base
+  inherits_from :advertisement
+  validates :title, :presence => true
+  validates :body, :presence => true
+end
