@@ -18,11 +18,10 @@ module MultipleTableInheritance
           
           @inherited_attribute_methods_mutex = Mutex.new
           
-          extend AttributeMethods, FinderMethods, SharedMethods
-          include InstanceMethods, SharedMethods
+          extend AttributeMethods, FinderMethods
+          include InstanceMethods
           include DelegateMethods if inherit_methods
           
-          # Set association references.
           self.parent_association_name = association_name.to_sym
           self.primary_key = "#{parent_association_name}_id"
           
@@ -37,9 +36,6 @@ module MultipleTableInheritance
           before_validation :set_association_subtype
           validate :parent_association_must_be_valid
           before_save :parent_association_must_be_saved
-          
-          # denote that the association methods have not been built
-          @loaded = false
         end
         
         def parent_association_class
@@ -110,9 +106,7 @@ module MultipleTableInheritance
             child.send(:parent_association=, parent) if parent
           end
         end
-      end
-      
-      module SharedMethods
+        
         def find_by_id(*args)
           send("find_by_#{parent_association_name}_id", *args)
         end
@@ -128,11 +122,11 @@ module MultipleTableInheritance
         private
         
         def parent_association
-          send(self.class.parent_association_name)
+          send(parent_association_name)
         end
         
         def parent_association=(record)
-          send("#{self.class.parent_association_name}=", record)
+          send("#{parent_association_name}=", record)
         end
         
         def set_association_subtype
@@ -163,16 +157,25 @@ module MultipleTableInheritance
       
       module DelegateMethods
         def method_missing(name, *args, &block)
-          if parent_association.respond_to?(name)
+          if parent_association_respond_to?(name)
             parent_association.send(name, *args, &block)
           else
-            super(name, *args, &block)
+            super
           end
         end
         
         def respond_to?(name, *args)
-          return true if name.to_sym == :parent_association
-          super(name, *args) || parent_association.respond_to?(name)
+          super || parent_association_respond_to?(name)
+        end
+        
+        private
+        
+        def parent_association_respond_to?(name)
+          parent_association_loaded? && parent_association.respond_to?(name)
+        end
+        
+        def parent_association_loaded?
+          !!association_instance_get(parent_association_name)
         end
       end
     end

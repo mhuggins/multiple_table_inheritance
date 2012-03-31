@@ -12,25 +12,25 @@ class Employee < ActiveRecord::Base
   validates :salary, :presence => true, :numericality => { :min => 0 }
   
   def give_raise!(amount)
-    Employee.update_counters self.id, :salary => amount
+    update_attributes(:salary => salary + amount)
   end
 end
 
 class Programmer < ActiveRecord::Base
-  inherits_from :employee  #, :methods => true
+  inherits_from :employee, :methods => true
   attr_accessible :languages, :language_ids
   has_many :known_languages
   has_many :languages, :through => :known_languages
 end
 
 class Manager < ActiveRecord::Base
-  inherits_from :employee  #, :methods => true
+  inherits_from :employee, :methods => true
   attr_accessible :bonus
   validates :bonus, :numericality => true
 end
 
 class Janitor < ActiveRecord::Base
-  inherits_from :employee  #, :methods => true
+  inherits_from :employee, :methods => true
 end
 
 class Team < ActiveRecord::Base

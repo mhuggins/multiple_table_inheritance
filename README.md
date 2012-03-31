@@ -25,7 +25,7 @@ From the command line:
 
 From your Gemfile:
 
-    gem 'multiple_table_inheritance', '~> 0.1.10'
+    gem 'multiple_table_inheritance', '~> 0.2.0'
 
 Usage
 =====
@@ -235,9 +235,6 @@ Methods
 When inheriting from another parent model, methods can optionally be called on
 the parent model automatically as well.  To do so, specify the `:methods`
 option when calling `inherits_from`.
-
-NOTE: This is not fully implemented yet as of version 0.1.10.  Please wait until
-a future release to prior to using this feature.
 
     class Employee < ActiveRecord::Base
       acts_as_superclass

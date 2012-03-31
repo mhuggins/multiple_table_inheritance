@@ -1,8 +1,15 @@
+0.2.0
+
+* Child model records can now inherit parent model methods via the :methods
+  option when calling :inherits_from.
+* Adjusted implementation of find_by_id.
+* Added unit tests pertaining to the above issues.
+
 0.1.10
 
 * Fix issue with sanitizer not allowing relationships to be set when mass
   assignment security is not specified.
-* Added unit tests specific to the above issue.
+* Added unit tests pertaining to the above issue.
 
 0.1.9
 

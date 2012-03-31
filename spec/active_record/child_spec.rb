@@ -18,6 +18,28 @@ describe MultipleTableInheritance::Child do
         @programmer.employee.should be_instance_of(Employee)
         @programmer.employee.id.should be(@programmer_id)
       end
+      
+      context 'via find_by_id on class' do
+        before do
+          @programmer = Programmer.find_by_id(@programmer_id)
+        end
+        
+        it 'should retrieve child records' do
+          @programmer.should be_instance_of(Programmer)
+          @programmer.id.should be(@programmer_id)
+        end
+      end
+      
+      context 'via find_by_id on relation' do
+        before do
+          @programmer = Programmer.where(Programmer.primary_key => @programmer_id).find_by_id(@programmer_id)
+        end
+        
+        it 'should retrieve child records' do
+          @programmer.should be_instance_of(Programmer)
+          @programmer.id.should be(@programmer_id)
+        end
+      end
     end
     
     context 'creating records' do
@@ -409,8 +431,13 @@ describe MultipleTableInheritance::Child do
         end
         
         it 'should allow parent methods to be called through child' do
-          pending "infinite recursion must be addressed"
-          # @programmer.should respond_to(:give_raise!)
+          @programmer.should respond_to(:give_raise!)
+        end
+        
+        it 'should call parent method through child' do
+          salary = @programmer.salary
+          @programmer.give_raise!(50)
+          @programmer.salary.should == salary + 50
         end
       end
       
