@@ -25,15 +25,11 @@ module MultipleTableInheritance
           self.parent_association_name = association_name.to_sym
           self.primary_key = "#{parent_association_name}_id"
           
-          # Ensure parent association is always returned.
-          define_method("#{parent_association_name}_with_autobuild") do
-            send("#{parent_association_name}_without_autobuild") || send("build_#{parent_association_name}")
-          end
+          define_parent_association_builder
           
           # Bind relationship, handle validation, and save properly.
           belongs_to parent_association_name, options
           alias_method_chain parent_association_name, :autobuild
-          before_validation :set_association_subtype
           validate :parent_association_must_be_valid
           before_save :parent_association_must_be_saved
         end
@@ -46,6 +42,17 @@ module MultipleTableInheritance
         end
         
         private
+        
+        def define_parent_association_builder
+          subtype_column = parent_association_class.subtype_column
+          define_method("#{parent_association_name}_with_autobuild") do
+            unless association = send("#{parent_association_name}_without_autobuild")
+              association = send("build_#{parent_association_name}")
+              association.send("#{subtype_column}=", self.class.to_s)
+            end
+            association
+          end
+        end
         
         def inherited_columns_and_associations
           # Get the associated columns and relationship names
@@ -127,13 +134,6 @@ module MultipleTableInheritance
         
         def parent_association=(record)
           send("#{parent_association_name}=", record)
-        end
-        
-        def set_association_subtype
-          association = parent_association
-          if association.attribute_names.include?(association.class.subtype_column)
-            association[association.class.subtype_column] = self.class.to_s
-          end
         end
         
         def parent_association_must_be_valid
