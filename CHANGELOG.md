@@ -1,3 +1,8 @@
+0.2.1
+
+* Ensure the subtype value is always set to the child class name even when a
+  new record is being built.
+
 0.2.0
 
 * Child model records can now inherit parent model methods via the :methods
