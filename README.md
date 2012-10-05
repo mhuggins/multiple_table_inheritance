@@ -75,7 +75,9 @@ extended.
     end
 
 As mentioned in the migration section, the name of the subtype column can be
-defined here if it's something other than the default of "subtype".
+defined here if it's something other than the default of "subtype".  (Please
+note that `type` is a reserved word in ActiveRecord, and naming your column
+as such should be avoided.)
 
     class Employee < ActiveRecord::Base
       acts_as_superclass, :subtype => 'employee_type'
